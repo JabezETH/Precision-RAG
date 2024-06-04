@@ -10,60 +10,50 @@ import shutil
 import fitz  # PyMuPDF
 from dotenv import load_dotenv
 
-CHROMA_PATH = "chroma"
-DATA_PATH = "/home/jabez/Documents/week_7/Precision-RAG/data"
+import sys
+sys.path.insert(1, '/home/jabez/Documents/week_7/Precision-RAG/notebooks/data_processing')
+import data_processing 
 
 # Load environment variables from .env file
 load_dotenv()
 
-def main():
-    generate_data_store()
+CHROMA_PATH = "chroma"
+DATA_PATH = "/home/jabez/Documents/week_7/Precision-RAG/data"
 
-def generate_data_store():
-    documents = load_documents()
-    chunks = split_text(documents)
-    save_to_chroma(chunks)
+# Use the cleaned paragraphs from your data_processing module
+cleaned_paragraphs = data_processing.cleaned_paragraphs
 
-def load_documents():
-    documents = []
+# Convert paragraphs to Document objects with metadata
+documents = [
+    Document(page_content=para, metadata={"source": f"document_{i}", "article": f"Article_{idx}"})
+    for i, doc in enumerate(cleaned_paragraphs) for idx, para in enumerate(doc.split("\n\n"))
+]
 
-    # Load Markdown files
-    md_loader = DirectoryLoader(DATA_PATH, glob="*.md")
-    documents.extend(md_loader.load())
+def split_paragraphs(documents: list[Document], chunk_size=1000, overlap=200):
+    chunks = []
+    current_chunk = []
+    current_metadata = {}
+    current_chunk_size = 0
 
-    # Load PDF files
-    pdf_paths = [os.path.join(DATA_PATH, f) for f in os.listdir(DATA_PATH) if f.endswith('.pdf')]
-    documents.extend(load_pdf_documents(pdf_paths))
+    for doc in documents:
+        words = doc.page_content.split()
+        if current_chunk_size + len(words) > chunk_size:
+            chunk_content = ' '.join(current_chunk)
+            chunks.append(Document(page_content=chunk_content, metadata=current_metadata))
+            current_chunk = words[-overlap:]  # Start new chunk with overlap
+            current_metadata = doc.metadata  # Inherit metadata
+            current_chunk_size = len(current_chunk)
+        else:
+            if not current_chunk:
+                current_metadata = doc.metadata
+            current_chunk.extend(words)
+            current_chunk_size += len(words)
 
-    return documents
+    if current_chunk:
+        chunk_content = ' '.join(current_chunk)
+        chunks.append(Document(page_content=chunk_content, metadata=current_metadata))
 
-def load_pdf_documents(pdf_paths: list[str]) -> list[Document]:
-    documents = []
-    for path in pdf_paths:
-        with fitz.open(path) as pdf:
-            text = ""
-            for page in pdf:
-                text += page.get_text()
-            documents.append(Document(page_content=text, metadata={"source": path}))
-    return documents
-
-def split_text(documents: list[Document]):
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=300,
-        chunk_overlap=100,
-        length_function=len,
-        add_start_index=True,
-    )
-    chunks = text_splitter.split_documents(documents)
     print(f"Split {len(documents)} documents into {len(chunks)} chunks.")
-
-    if len(chunks) > 10:
-        document = chunks[10]
-        print(document.page_content)
-        print(document.metadata)
-    else:
-        print("Not enough chunks to access the 11th one.")
-
     return chunks
 
 def save_to_chroma(chunks: list[Document]):
@@ -79,4 +69,5 @@ def save_to_chroma(chunks: list[Document]):
     print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
 if __name__ == "__main__":
-    main()
+    chunks = split_paragraphs(documents)
+    save_to_chroma(chunks)
