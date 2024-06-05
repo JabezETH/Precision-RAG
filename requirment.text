@@ -1,7 +1,10 @@
-pip install langchain_community
-pip install streamlit
-pip install langchain_openai
-pip install fitz
-pip install python-dotenv
-pip install PyMuPDF
-pip install chromadb
+langchain_community
+streamlit
+langchain_openai
+fitz
+python-dotenv
+PyMuPDF
+chromadb
+python-docx openai numpy faiss-cpu
+datasets
+ragas
