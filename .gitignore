@@ -1,4 +1,8 @@
 /env 
+<<<<<<< HEAD
 /data
 /chroma
 /home/jabez/Documents/week_7/Precision-RAG/frontend/chroma
+=======
+/data
+>>>>>>> ec9a4e5e699d807a0294a053ae50e625975288ef
