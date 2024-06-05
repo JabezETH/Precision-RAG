@@ -1,8 +1,7 @@
 import os
-from dataclasses import dataclass
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
@@ -10,6 +9,7 @@ from langchain.prompts import ChatPromptTemplate
 load_dotenv()
 
 CHROMA_PATH = "/home/jabez/Documents/week_7/Precision-RAG/chroma"
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 PROMPT_TEMPLATE = """
 You are a chatbot with expertise in Ethiopian criminal law.
@@ -26,8 +26,11 @@ def process_message(query_text):
     if not isinstance(query_text, str):
         query_text = str(query_text)  # Convert to string if necessary
 
+    if not OPENAI_API_KEY:
+        raise ValueError("OpenAI API key is not set in the environment variables.")
+
     # Prepare the DB.
-    embedding_function = OpenAIEmbeddings()
+    embedding_function = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
 
     # Search the DB.
@@ -50,7 +53,7 @@ def process_message(query_text):
     prompt = prompt_template.format(context=context_text, question=query_text)
 
     # Generate the response
-    model = ChatOpenAI()
+    model = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
     response_text = model.predict(prompt)
 
     # Ensure article numbers are mentioned explicitly
