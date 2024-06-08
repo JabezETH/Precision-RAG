@@ -12,6 +12,10 @@ PromptlyTech is an innovative e-business specializing in providing AI-driven sol
 - Automatic Evaluation Data Generation Service
 - Prompt Testing and Ranking Service
 
+## How it works
+
+The user provides a question and a scenario related to Ethiopian criminal law. The language model (LLM) then generates a prompt based on the user's input and formulates a response using the given context of Ethiopian criminal law.The original question provided by the user, the scenario, and the LLM's generated response are then used to create an evaluation dataset.Finally, the evaluation dataset is assessed using the RAGA (Relevance, Accuracy, Grammaticality, Appropriateness) toolkit. RAGA analyzes the dataset and provides scores for the relevance, accuracy, grammaticality, and appropriateness of the LLM's response. This workflow allows for the creation of an evaluation dataset that can be used to assess the performance of the language model in answering questions within the specific context of Ethiopian criminal law.
+
 ## Installation
 
 - Rag: https://python.langchain.com/v0.2/docs/tutorials/rag/
