@@ -14,7 +14,8 @@ PromptlyTech is an innovative e-business specializing in providing AI-driven sol
 
 ## Installation
 
-Rag: https://python.langchain.com/v0.2/docs/tutorials/rag/
-Ragas:https://docs.ragas.io/en/latest/getstarted/evaluation.html
-chromadb: https://www.trychroma.com/
-streamlit: https://streamlit.io/
+- Rag: https://python.langchain.com/v0.2/docs/tutorials/rag/
+- Ragas:https://docs.ragas.io/en/latest/getstarted/evaluation.html
+- chromadb: https://www.trychroma.com/
+- streamlit: https://streamlit.io/
+- langchain: https://python.langchain.com/v0.1/docs/get_started/installation/
